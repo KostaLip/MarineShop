@@ -1,0 +1,88 @@
+ <div class="category-admin-container">
+      <div class="header">
+        <h2>Manage categories</h2>
+        <button class="btn btn-primary" (click)="addNewCategory()">
+          <i class="icon-plus"></i>
+          Add new category
+        </button>
+      </div>
+
+      <div class="table-container" *ngIf="!loading; else loadingTemplate">
+        <table class="category-table" *ngIf="categories.length > 0; else emptyTemplate">
+          <thead>
+            <tr>
+              <th>ID</th>  
+              <th>Image</th>
+              <th>Name</th>
+              <th>Description</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let category of categories">
+              <td>{{ category.categoryID }}</td>
+              <td class="category-icon">
+                <img [src]="category.iconName" 
+                     [alt]="category.categoryName"
+                     class="icon-image">
+              </td>
+              <td class="category-name">{{ category.categoryName }}</td>
+              <td class="category-description">
+                {{ category.description }}
+              </td>
+              <td class="actions">
+                <button class="btn btn-edit" 
+                        (click)="editCategory(category)"
+                        title="Edit category">
+                  <i class="icon-edit"></i>
+                  Edit
+                </button>
+                <button class="btn btn-delete" 
+                        (click)="confirmDelete(category)"
+                        title="Delete category">
+                  <i class="icon-delete"></i>
+                  Delete
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <ng-template #loadingTemplate>
+        <div class="loading">
+          <p>Loading categories...</p>
+        </div>
+      </ng-template>
+
+      <ng-template #emptyTemplate>
+        <div class="empty-state">
+          <h3>No categories</h3>
+          <p>Currently there are no defined categories.</p>
+          <button class="btn btn-primary" (click)="addNewCategory()">
+            Add first category
+          </button>
+        </div>
+      </ng-template>
+
+      <div class="modal-overlay" *ngIf="showDeleteModal" (click)="cancelDelete()">
+        <div class="modal" (click)="$event.stopPropagation()">
+          <div class="modal-header">
+            <h3>Confirm delete</h3>
+          </div>
+          <div class="modal-body">
+            <p>Are you sure you want to delete the category:</p>
+            <strong>"{{ categoryToDelete?.categoryName }}"</strong>
+            <p class="warning">This acction can not be undone.</p>
+          </div>
+          <div class="modal-actions">
+            <button class="btn btn-cancel" (click)="cancelDelete()">
+              Exit
+            </button>
+            <button class="btn btn-confirm-delete" (click)="deleteCategory()">
+              Delete
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>

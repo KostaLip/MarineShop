@@ -1,0 +1,158 @@
+package com.marine_shop.shop_backend.controllers;
+
+import java.net.URI;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.marine_shop.shop_backend.dto.LoginRequest;
+import com.marine_shop.shop_backend.dto.UpdateUserRequest;
+import com.marine_shop.shop_backend.dto.UserResponse;
+import com.marine_shop.shop_backend.models.User;
+import com.marine_shop.shop_backend.services.UserService;
+
+import jakarta.servlet.http.HttpServletRequest;
+
+@CrossOrigin
+@RestController
+public class UserController {
+
+	@Autowired
+	private UserService service;
+	
+	@Autowired
+    private PasswordEncoder passwordEncoder;
+	
+	@GetMapping("/user/admin")
+	public List<User> getAllUsers() {
+		return service.getAll();
+	}
+	
+	@GetMapping("/user/{id}")
+	public ResponseEntity<?> getUserById(@PathVariable int id) {
+		Optional<User> user = service.findById(id);
+		if(user.isPresent()) {
+			UserResponse response = new UserResponse(user.get());
+			return ResponseEntity.ok(response);
+		}
+		return ResponseEntity.status(404).body("User with required ID: " + id + " does not exist");
+	}
+	
+	@PostMapping("/user")
+	public ResponseEntity<?> createUser(@RequestBody User user) {
+		if(service.existsById(user.getUserID())) {
+			return ResponseEntity.status(409).body("User already exists");
+		}
+		User savedUser = service.create(user);
+		URI uri = URI.create("/user/id/" + savedUser.getUserID());
+		return ResponseEntity.created(uri).body(savedUser);
+	}
+	
+	@PutMapping("/user/id/{id}")
+	public ResponseEntity<?> updateUser(@RequestBody User user, @PathVariable int id) {
+		Optional<User> updateUser = service.update(user, id);
+		if(updateUser.isPresent()) {
+			return ResponseEntity.ok(updateUser.get());
+		}
+		return ResponseEntity.status(409).body("User with required ID: " + id + " could not be updated because it does not exist");
+	}
+	
+	@DeleteMapping("/user/admin/id/{id}")
+	public ResponseEntity<?> deleteUser(@PathVariable int id) {
+		if(service.existsById(id)) {
+			service.delete(id);
+			return ResponseEntity.ok("User with ID: " + id + " has been successfully deleted");
+		}
+		return ResponseEntity.status(404).body("User with required ID: " + id + " cold not be deleted because it does not exist");
+	}
+	
+	@GetMapping("/user/email/{email}")
+	public ResponseEntity<?> getAllUsersByEmail(@PathVariable String email) {
+		Optional<User> user = service.findByEmail(email);
+		if(user.isPresent()) {
+			return ResponseEntity.ok(user.get());
+		}
+		return ResponseEntity.status(404).body("User with required email: " + email + " does not exist");
+	}
+	
+	@GetMapping("/user/firstName/{firstName}")
+	public ResponseEntity<?> getAllUsersByFirstName(@PathVariable String firstName) {
+		List<User> user = service.findByFirstName(firstName);
+		if(user.isEmpty()) {
+			return ResponseEntity.status(404).body("Users with required first name: " + firstName + " do not exist");
+		}
+		return ResponseEntity.ok(user);
+	}
+	
+	@GetMapping("/user/lastName/{lastName}")
+	public ResponseEntity<?> getAllUsersByLastName(@PathVariable String lastName) {
+		List<User> user = service.findByLastName(lastName);
+		if(user.isEmpty()) {
+			return ResponseEntity.status(404).body("Users with required last name: " + lastName + " do not exist");
+		}
+		return ResponseEntity.ok(user);
+	}
+	
+	@GetMapping("/user/isAdmin/true")
+	public ResponseEntity<?> getAllUsersByIsAdminTrue() {
+		List<User> user = service.findByIsAdminTrue();
+		if(user.isEmpty()) {
+			return ResponseEntity.status(404).body("Admin users do not exist");
+		}
+		return ResponseEntity.ok(user);
+	}
+	
+	@GetMapping("/user/isAdmin/false")
+	public ResponseEntity<?> getAllUsersByIsAdminFalse() {
+		List<User> user = service.findByIsAdminFalse();
+		if(user.isEmpty()) {
+			return ResponseEntity.status(404).body("Non admin users do not exist");
+		}
+		return ResponseEntity.ok(user);
+	}
+	
+	 @PostMapping("/signup")
+	    public ResponseEntity<?> signup(@RequestBody User user) {
+	        try {
+	            User savedUser = service.signup(user);
+	            return ResponseEntity.ok(savedUser);
+	        } catch (RuntimeException e) {
+	            return ResponseEntity.status(409).body(e.getMessage());
+	        }
+	    }
+
+	    @PostMapping("/login")
+	    public ResponseEntity<?> login(@RequestBody LoginRequest request, HttpServletRequest sRequest) {
+	        try {
+	            User user = service.login(request);
+	            String role = user.isAdmin() ? "ADMIN" : "USER";
+	            UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(
+	                    user.getEmail(), null, 
+	                    Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + role))
+	                );
+	                SecurityContextHolder.getContext().setAuthentication(auth);
+	                sRequest.getSession().setAttribute("SPRING_SECURITY_CONTEXT", SecurityContextHolder.getContext());
+	                System.out.println(user.getEmail());
+	            return ResponseEntity.ok(user);
+	        } catch (BadCredentialsException e) {
+	            return ResponseEntity.status(401).body(e.getMessage());
+	        }
+	    }
+	
+}

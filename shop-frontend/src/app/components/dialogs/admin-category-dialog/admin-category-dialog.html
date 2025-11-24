@@ -1,0 +1,70 @@
+<div class="dialog-container">
+  <div class="dialog-header">
+    <h2>{{ dialogTitle }}</h2>
+  </div>
+  
+  <form [formGroup]="categoryForm" (ngSubmit)="onSubmit()">
+    <div class="dialog-content">
+      <div class="form-group">
+        <label for="categoryName">Naziv Kategorije *</label>
+        <input 
+          type="text" 
+          id="categoryName"
+          formControlName="categoryName"
+          class="form-control"
+          [class.error]="isFieldInvalid('categoryName')"
+          placeholder="Unesite naziv kategorije">
+        <div class="error-message" *ngIf="isFieldInvalid('categoryName')">
+          {{ getFieldError('categoryName') }}
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="description">Opis *</label>
+        <textarea 
+          id="description"
+          formControlName="description"
+          class="form-control"
+          [class.error]="isFieldInvalid('description')"
+          placeholder="Unesite opis kategorije"
+          rows="3"></textarea>
+        <div class="error-message" *ngIf="isFieldInvalid('description')">
+          {{ getFieldError('description') }}
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="iconName">Slika Kategorije *</label>
+        <div class="file-input-wrapper">
+          <input 
+            type="file" 
+            #fileInput
+            (change)="onFileSelected($event)"
+            accept="image/*"
+            style="display: none;">
+          <div class="file-input-display" (click)="fileInput.click()">
+            <span class="file-icon">📁</span>
+            <span class="file-text">
+              {{ categoryForm.get('iconName')?.value || 'Izaberite sliku...' }}
+            </span>
+          </div>
+        </div>
+        <div class="error-message" *ngIf="isFieldInvalid('iconName')">
+          {{ getFieldError('iconName') }}
+        </div>
+      </div>
+    </div>
+
+    <div class="dialog-actions">
+      <button type="button" class="btn btn-cancel" (click)="onCancel()">
+        Otkaži
+      </button>
+      <button 
+        type="submit" 
+        class="btn btn-primary"
+        [disabled]="categoryForm.invalid">
+        {{ submitButtonText }}
+      </button>
+    </div>
+  </form>
+</div>

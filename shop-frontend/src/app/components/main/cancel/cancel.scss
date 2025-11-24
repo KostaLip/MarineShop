@@ -1,0 +1,114 @@
+.cancel-container {
+      min-height: 100vh;
+      background: linear-gradient(135deg, #f8f4e8 0%, #e8f0f8 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .cancel-card {
+      background: white;
+      padding: 40px;
+      border-radius: 20px;
+      box-shadow: 0 10px 30px rgba(161, 156, 72, 0.1);
+      text-align: center;
+      max-width: 500px;
+      width: 100%;
+    }
+
+    .wave-icon {
+      font-size: 60px;
+      margin-bottom: 20px;
+      animation: spin 3s ease-in-out infinite;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      25% { transform: rotate(90deg); }
+      50% { transform: rotate(180deg); }
+      75% { transform: rotate(270deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    h1 {
+      color: #b45309;
+      font-size: 28px;
+      margin-bottom: 15px;
+      font-weight: 600;
+    }
+
+    p {
+      color: #4a5568;
+      font-size: 16px;
+      line-height: 1.6;
+      margin-bottom: 25px;
+    }
+
+    .info-box {
+      background: #fef3c7;
+      padding: 15px;
+      border-radius: 10px;
+      margin-bottom: 30px;
+      font-size: 14px;
+      color: #92400e;
+      border: 1px solid #fcd34d;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .button-group {
+      display: flex;
+      gap: 15px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .btn-primary, .btn-secondary {
+      padding: 12px 24px;
+      border: none;
+      border-radius: 10px;
+      font-size: 16px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      min-width: 140px;
+    }
+
+    .btn-primary {
+      background: #0891b2;
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: #0e7490;
+      transform: translateY(-2px);
+    }
+
+    .btn-secondary {
+      background: #f7fafc;
+      color: #0891b2;
+      border: 2px solid #0891b2;
+    }
+
+    .btn-secondary:hover {
+      background: #0891b2;
+      color: white;
+      transform: translateY(-2px);
+    }
+
+    @media (max-width: 480px) {
+      .cancel-card {
+        padding: 30px 20px;
+      }
+      
+      .button-group {
+        flex-direction: column;
+      }
+      
+      .btn-primary, .btn-secondary {
+        width: 100%;
+      }
+    }

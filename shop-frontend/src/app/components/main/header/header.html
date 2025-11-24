@@ -1,0 +1,68 @@
+<header class="app-header">
+  <div class="ocean-waves">
+    <div class="wave wave1"></div>
+    <div class="wave wave2"></div>
+    <div class="wave wave3"></div>
+  </div>
+  
+  <div class="header-content">
+    <div class="logo-section">
+      <i class="fas fa-ship logo-icon"></i>
+      <h1 class="logo-title">
+        <span class="marine-text">⚓ Marine</span>
+        <span class="shop-text">Harbor</span>
+      </h1>
+    </div>
+    
+    <nav class="main-nav" *ngIf="currentUser">
+      <a class="nav-link" (click)="openHome()">
+        <i class="fas fa-home"></i>
+        <span>Home</span>
+      </a>
+      <a class="nav-link" (click)="openProducts()">
+        <i class="fas fa-anchor"></i>
+        <span>Products</span>
+      </a>
+      <a class="nav-link cart-link" (click)="goToCart()">
+        <i class="fas fa-shopping-bag"></i>
+        <span>Cart</span>
+      </a>
+    </nav>
+    <div class="user-menu" *ngIf="currentUser" (click)="toggleMenu()">
+      <div class="captain-avatar">
+        <i class="fas fa-user-tie captain-icon"></i>
+        <span class="captain-rank">
+          {{ currentUser.firstName }} {{ currentUser.lastName }}
+        </span>
+        <i class="fas fa-chevron-down dropdown-arrow" [class.rotated]="menuOpen"></i>
+      </div>
+      
+      <div class="dropdown" [class.show]="menuOpen">
+        <div class="dropdown-header">
+          <i class="fas fa-compass"></i>
+          <span>Navigation Menu</span>
+        </div>
+        <ul class="dropdown-menu">
+          <li class="dropdown-item" (click)="goToOrders()">
+            <i class="fas fa-user-edit"></i>
+            <span>My Orders</span>
+          </li>
+          <li class="dropdown-item" (click)="editProfile()">
+            <i class="fas fa-user-edit"></i>
+            <span>Edit Profile</span>
+          </li>
+          <li class="dropdown-item logout-item" (click)="logout()">
+            <i class="fas fa-sign-out-alt"></i>
+            <span>Log out</span>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  
+  <div class="floating-elements">
+    <i class="fas fa-fish floating-fish fish1"></i>
+    <i class="fas fa-fish floating-fish fish2"></i>
+    <i class="fas fa-anchor floating-anchor"></i>
+  </div>
+</header>

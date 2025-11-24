@@ -1,0 +1,140 @@
+<div class="cart-page">
+  <div class="ocean-bg"></div>
+  
+  <div class="container">
+    <header class="cart-header">
+      <div class="header-content">
+        <h1 class="cart-title">Cart</h1>
+        <div class="cart-counter" *ngIf="totalItems > 0">
+          <span class="counter-bubble">{{ totalItems }}</span>
+          <span class="counter-text">products</span>
+        </div>
+      </div>
+      <div class="wave-divider"></div>
+    </header>
+
+    <div *ngIf="cartItems.length === 0" class="empty-state">
+      <div class="empty-icon">
+        <div class="bubble-animation">
+          <div class="bubble"></div>
+          <div class="bubble"></div>
+          <div class="bubble"></div>
+        </div>
+        🌊
+      </div>
+      <h2 class="empty-title">Your cart is empty</h2>
+      <p class="empty-subtitle">Explore our products and add them to cart</p>
+      <button class="btn-floating" (click)="continueShopping()">
+        <span>Explore products</span>
+        <div class="ripple"></div>
+      </button>
+    </div>
+
+    <div *ngIf="cartItems.length > 0" class="cart-content">
+      <div class="items-section">
+        <div class="items-container">
+          <div *ngFor="let item of cartItems; trackBy: trackByProductId" 
+               class="cart-item"
+               [@slideIn]>
+            
+            <div class="item-image-wrapper">
+              <div class="item-image">
+                <img [src]="item.imageUrl || '/assets/placeholder.jpg'" 
+                     [alt]="item.productName"
+                     loading="lazy">
+                <div class="image-overlay"></div>
+              </div>
+            </div>
+
+            <div class="item-info">
+              <h3 class="item-name">{{ item.productName }}</h3>
+              <div class="item-price">
+                {{ item.price | currency:'EUR':'symbol':'1.2-2' }}
+              </div>
+              <div class="stock-info">
+                Stock quantity: {{ item.maxStock }}
+              </div>
+            </div>
+
+            <div class="quantity-section">
+              <div class="quantity-label">Quantity</div>
+              <div class="quantity-controls">
+                <button class="qty-btn decrease" 
+                        (click)="updateQuantity(item.productId, item.quantity - 1)"
+                        [disabled]="item.quantity <= 1"
+                        [class.disabled]="item.quantity <= 1">
+                  <span>−</span>
+                </button>
+                
+                <div class="quantity-display">
+                  <span class="qty-number">{{ item.quantity }}</span>
+                </div>
+                
+                <button class="qty-btn increase" 
+                        (click)="updateQuantity(item.productId, item.quantity + 1)"
+                        [disabled]="item.quantity >= item.maxStock"
+                        [class.disabled]="item.quantity >= item.maxStock">
+                  <span>+</span>
+                </button>
+              </div>
+            </div>
+
+            <div class="item-total">
+              <div class="total-label">Total</div>
+              <div class="total-price">
+                {{ (item.price * item.quantity) | currency:'EUR':'symbol':'1.2-2' }}
+              </div>
+            </div>
+
+            <button class="remove-btn" 
+                    (click)="removeItem(item.productId)"
+                    title="Remove product">
+              <span class="remove-icon">✕</span>
+              <div class="remove-ripple"></div>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="summary-section">
+        <div class="summary-card">
+          <div class="summary-header">
+            <h3>Order overview</h3>
+            <div class="summary-wave"></div>
+          </div>
+
+          <div class="summary-details">
+            <div class="summary-row">
+              <span class="row-label">Products</span>
+              <span class="row-value">{{ totalItems }}</span>
+            </div>
+
+            <div class="summary-divider"></div>
+
+            <div class="summary-row total-row">
+              <span class="row-label">In total</span>
+              <span class="row-value total-amount">
+                {{ totalPrice | currency:'EUR':'symbol':'1.2-2' }}
+              </span>
+            </div>
+          </div>
+
+          <div class="summary-actions">
+            <button class="btn-secondary" (click)="clearCart()">
+              <span>Empty cart</span>
+            </button>
+            
+            <button class="btn-primary" (click)="checkout()">
+              <span>Checkout</span>
+              <div class="btn-wave"></div>
+            </button>
+
+            <button class="btn-link" (click)="continueShopping()">
+              Continue shopping
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

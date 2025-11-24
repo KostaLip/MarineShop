@@ -1,0 +1,172 @@
+<div class="checkout-container">
+  <div class="checkout-header">
+    <h1>Checkout</h1>
+    <div class="secure-badge">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+        <path d="M7 11V7a5 5 0 0110 0v4"></path>
+      </svg>
+      Secure Checkout with Stripe
+    </div>
+  </div>
+
+  <div class="checkout-content">
+    <div class="checkout-grid">
+      
+      <div class="shipping-section">
+        <h2>📍 Shipping Information</h2>
+        
+        <form [formGroup]="checkoutForm" class="shipping-form">
+          <div class="form-group">
+            <label for="address">Shipping Address *</label>
+            <input 
+              id="address"
+              type="text" 
+              formControlName="address"
+              placeholder="Enter your street address"
+              class="form-control"
+              [class.error]="isFieldInvalid('address')">
+            <span class="error-message" *ngIf="isFieldInvalid('address')">
+              {{ getErrorMessage('address') }}
+            </span>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="city">City *</label>
+              <input 
+                id="city"
+                type="text" 
+                formControlName="city"
+                placeholder="Enter your city"
+                class="form-control"
+                [class.error]="isFieldInvalid('city')">
+              <span class="error-message" *ngIf="isFieldInvalid('city')">
+                {{ getErrorMessage('city') }}
+              </span>
+            </div>
+
+            <div class="form-group">
+              <label for="country">Country *</label>
+              <select 
+                id="country"
+                formControlName="country"
+                class="form-control">
+                <option value="Serbia">Serbia</option>
+                <option value="Montenegro">Montenegro</option>
+                <option value="Bosnia and Herzegovina">Bosnia and Herzegovina</option>
+                <option value="Croatia">Croatia</option>
+                <option value="Slovenia">Slovenia</option>
+                <option value="Macedonia">Macedonia</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="notes">Additional Notes (Optional)</label>
+            <textarea 
+              id="notes"
+              formControlName="additionalNotes"
+              placeholder="Any special delivery instructions..."
+              rows="3"
+              class="form-control">
+            </textarea>
+          </div>
+        </form>
+
+        <div class="user-info" *ngIf="currentUser">
+          <h3>👤 Customer Information</h3>
+          <div class="info-grid">
+            <div class="info-item">
+              <span class="label">Name:</span>
+              <span class="value">{{ currentUser.firstName }} {{ currentUser.lastName }}</span>
+            </div>
+            <div class="info-item">
+              <span class="label">Email:</span>
+              <span class="value">{{ currentUser.email }}</span>
+            </div>
+            <div class="info-item" *ngIf="currentUser.phone">
+              <span class="label">Phone:</span>
+              <span class="value">{{ currentUser.phone }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="order-summary">
+        <h2>📦 Order Summary</h2>
+        
+        <div class="items-list">
+          <div class="cart-item" *ngFor="let item of cartItems">
+            <img [src]="item.imageUrl || 'assets/placeholder.jpg'" [alt]="item.productName">
+            <div class="item-details">
+              <h4>{{ item.productName }}</h4>
+              <p class="item-meta">Qty: {{ item.quantity }}</p>
+            </div>
+            <div class="item-price">
+              {{ formatPrice(item.price * item.quantity) }}
+            </div>
+          </div>
+        </div>
+
+        <div class="summary-totals">
+          <div class="total-row">
+            <span>Subtotal:</span>
+            <span>{{ formatPrice(totalPrice) }}</span>
+          </div>
+          <div class="total-row">
+            <span>Shipping:</span>
+            <span>Free</span>
+          </div>
+          <div class="total-row total-final">
+            <span>Total:</span>
+            <span>{{ formatPrice(totalPrice) }}</span>
+          </div>
+        </div>
+
+        <div class="payment-info">
+          <h3>💳 Payment Method</h3>
+          <div class="stripe-info">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/b/ba/Stripe_Logo%2C_revised_2016.svg" alt="Stripe" class="stripe-logo">
+            <p>You will be redirected to Stripe's secure payment page</p>
+            <div class="accepted-cards">
+              <span class="card-badge">Visa</span>
+              <span class="card-badge">Mastercard</span>
+              <span class="card-badge">Amex</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="action-buttons">
+          <button 
+            type="button" 
+            class="btn-secondary" 
+            (click)="goBackToCart()">
+            ← Back to Cart
+          </button>
+          
+          <button 
+            type="button" 
+            class="btn-primary" 
+            (click)="proceedToStripeCheckout()"
+            [disabled]="checkoutForm.invalid || isProcessing || cartItems.length === 0">
+            <span *ngIf="!isProcessing">
+              Proceed to Payment →
+            </span>
+            <span *ngIf="isProcessing" class="loading">
+              <span class="spinner"></span>
+              Processing...
+            </span>
+          </button>
+        </div>
+
+        <div class="security-note">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+          </svg>
+          Your payment information is encrypted and secure
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

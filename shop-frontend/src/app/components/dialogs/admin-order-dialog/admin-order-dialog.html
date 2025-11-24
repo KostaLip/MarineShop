@@ -1,0 +1,101 @@
+<div class="dialog-container">
+  <div class="dialog-header">
+    <h2>{{ dialogTitle }}</h2>
+  </div>
+
+  <div class="order-info">
+    <div class="info-row">
+      <span class="label">Kupac:</span>
+      <span class="value">{{ data.order?.user?.firstName }} {{ data.order?.user?.lastName }}</span>
+    </div>
+    <div class="info-row">
+      <span class="label">Email:</span>
+      <span class="value">{{ data.order?.user?.email }}</span>
+    </div>
+    <div class="info-row">
+      <span class="label">Datum porudžbine:</span>
+      <span class="value">{{ formatDate(data.order?.orderDate || '') }}</span>
+    </div>
+    <div class="info-row">
+      <span class="label">Ukupno:</span>
+      <span class="value price">{{ formatPrice(data.order?.totalPrice || 0) }}</span>
+    </div>
+  </div>
+
+  <form [formGroup]="orderForm" (ngSubmit)="onSubmit()">
+    <div class="dialog-content">
+      <div class="form-group">
+        <label for="status">Status *</label>
+        <select
+          id="status"
+          formControlName="status"
+          class="form-control"
+          [class.error]="isFieldInvalid('status')">
+          <option value="">Izaberite status</option>
+          <option value="PENDING">PENDING</option>
+          <option value="PAID">PAID</option>
+          <option value="SHIPPED">SHIPPED</option>
+          <option value="DELIVERED">DELIVERED</option>
+          <option value="CANCELLED">CANCELLED</option>
+        </select>
+        <div class="error-message" *ngIf="isFieldInvalid('status')">
+          {{ getFieldError('status') }}
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="shippingCountry">Zemlja *</label>
+        <input
+          type="text"
+          id="shippingCountry"
+          formControlName="shippingCountry"
+          class="form-control"
+          [class.error]="isFieldInvalid('shippingCountry')"
+          placeholder="Unesite zemlju">
+        <div class="error-message" *ngIf="isFieldInvalid('shippingCountry')">
+          {{ getFieldError('shippingCountry') }}
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="shippingCity">Grad *</label>
+        <input
+          type="text"
+          id="shippingCity"
+          formControlName="shippingCity"
+          class="form-control"
+          [class.error]="isFieldInvalid('shippingCity')"
+          placeholder="Unesite grad">
+        <div class="error-message" *ngIf="isFieldInvalid('shippingCity')">
+          {{ getFieldError('shippingCity') }}
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="shippingAddress">Adresa *</label>
+        <textarea
+          id="shippingAddress"
+          formControlName="shippingAddress"
+          class="form-control"
+          [class.error]="isFieldInvalid('shippingAddress')"
+          placeholder="Unesite adresu"
+          rows="2"></textarea>
+        <div class="error-message" *ngIf="isFieldInvalid('shippingAddress')">
+          {{ getFieldError('shippingAddress') }}
+        </div>
+      </div>
+    </div>
+
+    <div class="dialog-actions">
+      <button type="button" class="btn btn-cancel" (click)="onCancel()">
+        Otkaži
+      </button>
+      <button
+        type="submit"
+        class="btn btn-primary"
+        [disabled]="orderForm.invalid">
+        Sačuvaj Izmene
+      </button>
+    </div>
+  </form>
+</div>

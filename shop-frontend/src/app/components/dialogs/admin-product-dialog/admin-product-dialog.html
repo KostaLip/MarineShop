@@ -1,0 +1,147 @@
+<div class="dialog-container">
+  <div class="dialog-header">
+    <h2>{{ dialogTitle }}</h2>
+  </div>
+ 
+  <form [formGroup]="productForm" (ngSubmit)="onSubmit()">
+    <div class="dialog-content">
+      <div class="form-group">
+        <label for="productName">Naziv Proizvoda *</label>
+        <input
+          type="text"
+          id="productName"
+          formControlName="productName"
+          class="form-control"
+          [class.error]="isFieldInvalid('productName')"
+          placeholder="Unesite naziv proizvoda">
+        <div class="error-message" *ngIf="isFieldInvalid('productName')">
+          {{ getFieldError('productName') }}
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="description">Opis *</label>
+        <textarea
+          id="description"
+          formControlName="description"
+          class="form-control"
+          [class.error]="isFieldInvalid('description')"
+          placeholder="Unesite opis proizvoda"
+          rows="3"></textarea>
+        <div class="error-message" *ngIf="isFieldInvalid('description')">
+          {{ getFieldError('description') }}
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="price">Cijena *</label>
+        <input
+          type="number"
+          id="price"
+          formControlName="price"
+          class="form-control"
+          [class.error]="isFieldInvalid('price')"
+          placeholder="0.00"
+          step="0.01"
+          min="0">
+        <div class="error-message" *ngIf="isFieldInvalid('price')">
+          {{ getFieldError('price') }}
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="stockQuantity">Količina na Lageru *</label>
+        <input
+          type="number"
+          id="stockQuantity"
+          formControlName="stockQuantity"
+          class="form-control"
+          [class.error]="isFieldInvalid('stockQuantity')"
+          placeholder="0"
+          min="0">
+        <div class="error-message" *ngIf="isFieldInvalid('stockQuantity')">
+          {{ getFieldError('stockQuantity') }}
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="categoryID">Kategorija *</label>
+        <select
+          id="categoryID"
+          formControlName="categoryID"
+          class="form-control"
+          [class.error]="isFieldInvalid('categoryID')">
+          <option value="">Izaberite kategoriju</option>
+          <option *ngFor="let category of categories" [value]="category.categoryID">
+            {{ category.categoryName }}
+          </option>
+        </select>
+        <div class="error-message" *ngIf="isFieldInvalid('categoryID')">
+          {{ getFieldError('categoryID') }}
+        </div>
+      </div>
+
+      <div class="form-group" *ngIf="!isEditMode">
+        <label for="displayImage">Slika Proizvoda *</label>
+        <div class="file-input-wrapper">
+          <input
+            type="file"
+            #fileInput
+            (change)="onFileSelected($event)"
+            accept="image/*"
+            style="display: none;">
+          <div class="file-input-display" (click)="fileInput.click()">
+            <span class="file-icon">📁</span>
+            <span class="file-text">
+              {{ selectedFile ? selectedFile.name : (productForm.get('displayImage')?.value ? 'Slika odabrana' : 'Izaberite sliku...') }}
+            </span>
+          </div>
+        </div>
+        <div class="error-message" *ngIf="isFieldInvalid('displayImage')">
+          {{ getFieldError('displayImage') }}
+        </div>
+      <div class="form-group" *ngIf="!isEditMode">
+        <label for="additionalImages">Dodatne Slike (maksimalno {{maxImages}})</label>
+        <div class="file-input-wrapper">
+          <input
+            type="file"
+            #additionalFileInput
+            (change)="onMultipleFilesSelected($event)"
+            accept="image/*"
+            multiple
+            style="display: none;">
+          <div class="file-input-display" (click)="additionalFileInput.click()">
+            <span class="file-icon">📁</span>
+            <span class="file-text">
+              {{ selectedFiles.length > 0 ? selectedFiles.length + ' slika odabrano' : 'Izaberite dodatne slike...' }}
+            </span>
+          </div>
+        </div>
+        <small>Odabrane slike: {{selectedFiles.length}}/{{maxImages}}</small>
+        <div *ngIf="previewUrls.length > 0" class="additional-previews">
+          <div *ngFor="let url of previewUrls; let i = index" class="preview-item">
+            <img [src]="url" alt="Additional preview" class="preview-image-small">
+            <button type="button" class="remove-btn" (click)="removeImage(i)">×</button>
+          </div>
+        </div>
+      </div>
+        <div *ngIf="previewUrl" class="image-preview">
+          <img [src]="previewUrl" alt="Preview" class="preview-image">
+        </div>
+      </div>
+    </div>
+
+    <div class="dialog-actions">
+      <button type="button" class="btn btn-cancel" (click)="onCancel()">
+        Otkaži
+      </button>
+      <button
+        type="submit"
+        class="btn btn-primary"
+        [disabled]="productForm.invalid || uploading">
+        <span *ngIf="uploading">Uploading...</span>
+        <span *ngIf="!uploading">{{ submitButtonText }}</span>
+      </button>
+    </div>
+  </form>
+</div>

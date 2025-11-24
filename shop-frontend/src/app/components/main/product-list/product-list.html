@@ -1,0 +1,62 @@
+<section class="product-list">
+  <div class="container">
+    <div class="section-header">
+      <h2>Our products</h2>
+      <p>Our products</p>
+      
+      <div class="search-filters">
+        <div class="search-box">
+          <span class="search-icon">🔍</span>
+          <input 
+            type="text" 
+            placeholder="Search products..." 
+            [(ngModel)]="searchTerm"
+            (input)="onSearchChange()">
+        </div>
+        
+        <div style="display: flex; gap: 1rem; align-items: end;">
+          <div class="filter-group">
+            <label>Rating</label>
+            <select [(ngModel)]="ratingFilter" (change)="onFilterChange()">
+              <option value="">Rating</option>
+              <option value="5">5 ⭐</option>
+              <option value="4">4+ ⭐</option>
+              <option value="3">3+ ⭐</option>
+              <option value="2">2+ ⭐</option>
+              <option value="1">1+ ⭐</option>
+            </select>
+          </div>
+          
+          <button class="clear-filters" (click)="clearFilters()">
+            Clear filters
+          </button>
+        </div>
+      </div>
+    </div>
+   
+    <div class="products-grid">
+      <div class="product-card" *ngFor="let product of filteredProducts">
+        <div class="product-image">
+          <img [src]="product.displayImage" [alt]="product.productName">
+        </div>
+        <div class="product-content">
+          <h3>{{ product.productName }}</h3>
+          <span class="product-rating">
+            Rating: {{ product.rating | number:'1.1-1' }}
+          </span>
+          <p class="price">{{ product.price | currency:'RSD':'symbol':'1.0-0' }}</p>
+          <p class="stock" [ngClass]="{'out-of-stock': product.stockQuantity === 0}">
+            {{ product.stockQuantity > 0 ? 'Stock quantity: ' + product.stockQuantity : 'Nema na stanju' }}
+          </p>
+          <button class="btn-primary" [disabled]="product.stockQuantity == 0" (click)="addToCart(product)">Add to cart</button><br>
+          <button class="btn-details" (click)="openProductDialog(product)">
+            More Details
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<div class="toast" [class.show]="showToast">
+  {{ toastMessage }}
+</div>

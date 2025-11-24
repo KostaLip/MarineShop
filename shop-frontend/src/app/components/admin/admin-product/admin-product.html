@@ -1,0 +1,90 @@
+<div class="category-admin-container">
+  <div class="header">
+    <h2>Manage products</h2>
+    <button class="btn btn-primary" (click)="addNewProduct()">
+      <i class="icon-plus"></i>
+      Add new product
+    </button>
+  </div>
+  <div class="table-container" *ngIf="!loading; else loadingTemplate">
+    <table class="category-table" *ngIf="products.length > 0; else emptyTemplate">
+      <thead>
+        <tr>
+          <th>ID</th>  
+          <th>Image</th>
+          <th>Name</th>
+          <th>Price</th>
+          <th>Category</th>
+          <th>Quantity</th>
+          <th>Description</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let product of products">
+          <td>{{ product.productID }}</td>
+          <td class="category-icon">
+            <img [src]="product.displayImage"
+                 [alt]="product.productName"
+                 class="icon-image">
+          </td>
+          <td class="category-name">{{ product.productName }}</td>
+          <td class="product-price">{{ product.price | currency:'EUR':'symbol':'1.2-2' }}</td>
+          <td class="product-category">{{ product.category.categoryName }}</td>
+          <td class="product-stock">{{ product.stockQuantity }}</td>
+          <td class="category-description">
+            {{ product.description }}
+          </td>
+          <td class="actions">
+            <button class="btn btn-edit"
+                    (click)="editProduct(product)"
+                    title="Edit product">
+              <i class="icon-edit"></i>
+              Edit
+            </button>
+            <button class="btn btn-delete"
+                    (click)="confirmDelete(product)"
+                    title="Delete product">
+              <i class="icon-delete"></i>
+              Delete
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <ng-template #loadingTemplate>
+    <div class="loading">
+      <p>Loadnig products...</p>
+    </div>
+  </ng-template>
+  <ng-template #emptyTemplate>
+    <div class="empty-state">
+      <h3>No products</h3>
+      <p>Currently there are no defined products.</p>
+      <button class="btn btn-primary" (click)="addNewProduct()">
+        Add new product
+      </button>
+    </div>
+  </ng-template>
+  <div class="modal-overlay" *ngIf="showDeleteModal" (click)="cancelDelete()">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>Confirm delete</h3>
+      </div>
+      <div class="modal-body">
+        <p>Are you sure you want to delete the product:</p>
+        <strong>"{{ productToDelete?.productName }}"</strong>
+        <p class="warning">This action can not be undone.</p>
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-cancel" (click)="cancelDelete()">
+          Exit
+        </button>
+        <button class="btn btn-confirm-delete" (click)="deleteProduct()">
+          Delete
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

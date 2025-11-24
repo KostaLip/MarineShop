@@ -1,0 +1,88 @@
+<div class="user-admin-container">
+  <div class="header">
+    <h2>Manage users</h2>
+    <button class="btn btn-primary" (click)="addNewUser()">
+      <i class="icon-plus"></i>
+      Add new user
+    </button>
+  </div>
+  
+  <div class="table-container" *ngIf="!loading; else loadingTemplate">
+    <table class="user-table" *ngIf="users.length > 0; else emptyTemplate">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Name</th>
+          <th>Email</th>
+          <th>Phone</th>
+          <th>Role</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let user of users">
+          <td>{{ user.userID }}</td>
+          <td class="user-name">{{ user.firstName }} {{ user.lastName }}</td>
+          <td class="user-email">{{ user.email }}</td>
+          <td>{{ user.phone || '-' }}</td>
+          <td>
+            <span class="admin-badge" [class.admin]="user.admin" [class.user]="!user.admin">
+              {{ user.admin ? 'ADMIN' : 'KORISNIK' }}
+            </span>
+          </td>
+          <td class="actions">
+            <button class="btn btn-edit"
+                    (click)="editUser(user)"
+                    title="Edit user">
+              <i class="icon-edit"></i>
+              Edit
+            </button>
+            <button class="btn btn-delete"
+                    (click)="confirmDelete(user)"
+                    title="Delete user">
+              <i class="icon-delete"></i>
+              Delete
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  
+  <ng-template #loadingTemplate>
+    <div class="loading">
+      <p>Loading users...</p>
+    </div>
+  </ng-template>
+  
+  <ng-template #emptyTemplate>
+    <div class="empty-state">
+      <h3>No users</h3>
+      <p>Currently there are no defined users.</p>
+      <button class="btn btn-primary" (click)="addNewUser()">
+        Add first user
+      </button>
+    </div>
+  </ng-template>
+  
+  <div class="modal-overlay" *ngIf="showDeleteModal" (click)="cancelDelete()">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>Confirm delete</h3>
+      </div>
+      <div class="modal-body">
+        <p>Are you sure you want to delete the user:</p>
+        <strong>"{{ userToDelete?.firstName }} {{ userToDelete?.lastName }}" ({{ userToDelete?.email }})</strong>
+        <p class="warning">This action can not be undone.</p>
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-cancel" (click)="cancelDelete()">
+          Exit
+        </button>
+        <button class="btn btn-confirm-delete" (click)="deleteUser()">
+          Delete
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

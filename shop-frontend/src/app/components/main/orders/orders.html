@@ -1,0 +1,40 @@
+<div class="orders-container">
+  <div class="header">
+    <button class="back-btn" (click)="goBack()">← Back</button>
+    <h1>My orders</h1>
+  </div>
+
+  <div *ngIf="loading" class="loading">
+    Loading orders...
+  </div>
+
+  <div *ngIf="!loading && orders.length === 0" class="no-orders">
+    <p>Vou do not have orders.</p>
+  </div>
+
+  <div *ngIf="!loading && orders.length > 0" class="orders-list">
+    <div *ngFor="let order of orders" class="order-card">
+      <div class="order-header">
+        <span class="order-number">Order #{{ order.orderID }}</span>
+        <span class="order-status" [class]="getStatusClass(order.status)">{{ order.status }}</span>
+      </div>
+      
+      <div class="order-details">
+        <div class="detail-row">
+          <span class="label">Date:</span>
+          <span class="value">{{ formatDate(order.orderDate) }}</span>
+        </div>
+        
+        <div class="detail-row">
+          <span class="label">Total:</span>
+          <span class="value price">{{ formatPrice(order.totalPrice) }}</span>
+        </div>
+        
+        <div class="detail-row">
+          <span class="label">Address:</span>
+          <span class="value">{{ order.shippingAddress }}, {{ order.shippingCity }}, {{ order.shippingCountry }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

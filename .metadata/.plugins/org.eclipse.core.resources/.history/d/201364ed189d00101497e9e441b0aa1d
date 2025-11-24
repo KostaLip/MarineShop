@@ -1,0 +1,86 @@
+package com.marine_shop.shop_backend.config;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.provisioning.InMemoryUserDetailsManager;
+import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+
+import com.marine_shop.shop_backend.repository.UserRepository;
+
+@Configuration
+public class SecurityConfig {
+	
+	@Autowired
+	private UserRepository repo;
+	
+	@Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        http
+            .csrf().disable()
+            .cors()
+            .and()
+            .authorizeHttpRequests(auth -> auth
+            		.requestMatchers("/login", "/signup", "/payments/**").permitAll()
+            		//.requestMatchers("/category").hasRole("ADMIN")
+            		.requestMatchers("/user/admin/**", "/category/admin/**", "/order/admin/**", "/product/admin/**").hasRole("ADMIN")
+                .anyRequest().authenticated()
+            )
+            .formLogin().disable()
+            .httpBasic().disable()
+            .sessionManagement()
+            		.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED);
+        return http.build();
+    }
+
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+
+    @Bean
+    public UserDetailsService userDetailsService() {
+    	return new UserDetailsService() {
+            @Override
+            public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+                com.marine_shop.shop_backend.models.User user = repo.findByEmail(email)
+                        .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+
+                String role = user.isAdmin() ? "ADMIN" : "USER";
+
+                return org.springframework.security.core.userdetails.User
+                        .withUsername(user.getEmail())
+                        .password(user.getPasswordHash())
+                        .roles(role)
+                        .build();
+            }
+        };
+    }
+    
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        configuration.setAllowedOrigins(List.of("http://localhost:4200"));
+        configuration.setAllowedMethods(List.of("GET","POST","PUT","DELETE", "OPTIONS"));
+        configuration.setAllowCredentials(true);
+        configuration.setAllowedHeaders(List.of("*"));
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
+    }
+}

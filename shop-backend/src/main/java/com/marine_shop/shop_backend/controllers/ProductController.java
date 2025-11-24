@@ -1,0 +1,155 @@
+package com.marine_shop.shop_backend.controllers;
+
+import java.util.List;
+import java.util.Optional;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.marine_shop.shop_backend.dto.ProductRequest;
+import com.marine_shop.shop_backend.models.Category;
+import com.marine_shop.shop_backend.models.Product;
+import com.marine_shop.shop_backend.services.CategoryService;
+import com.marine_shop.shop_backend.services.ProductService;
+
+@CrossOrigin(origins = "http://localhost:4200")
+@RestController
+public class ProductController {
+
+	@Autowired
+	private ProductService service;
+	
+	@Autowired
+	private CategoryService categoryService;
+	
+	@GetMapping("/product")
+	public List<Product> getAllProducts() {
+		return service.getAll();
+	}
+	
+	@GetMapping("/product/{id}")
+	public ResponseEntity<?> getProductById(@PathVariable int id) {
+		Optional<Product> product = service.findById(id);
+		if(product.isPresent()) {
+			return ResponseEntity.ok(product.get());
+		}
+		return ResponseEntity.status(404).body("Product with required ID: " + id + " does not exist");
+	}
+	
+	@PostMapping("/product/admin")
+	public ResponseEntity<?> createProduct(@RequestBody ProductRequest request) {
+		Category category = categoryService.findById(request.getCategoryId())
+		        .orElseThrow(() -> new RuntimeException("Category not found"));
+		Product product = new Product();
+		product.setProductName(request.getProductName());
+		product.setDescription(request.getDescription());
+		product.setPrice(request.getPrice());
+		product.setStockQuantity(request.getStockQuantity());
+		product.setCategory(category);
+		Product saved = service.create(product);
+		return ResponseEntity.ok(saved);
+	}
+	
+	@PutMapping("/product/admin/id/{id}")
+	public ResponseEntity<?> updateProduct(@RequestBody ProductRequest request, @PathVariable int id) {
+		Optional<Product> updateProduct = service.findById(id);
+		if(updateProduct.isEmpty()) {
+			return ResponseEntity.status(404).body("Product with required ID: " + id + " cold not be deleted because it does not exist");
+		}
+		Product product = updateProduct.get();
+		Optional<Category> updateCategory = categoryService.findById(request.getCategoryId());
+		if(updateCategory.isPresent()) {
+			product.setCategory(updateCategory.get());
+		}
+		product.setProductName(request.getProductName());
+		product.setDescription(request.getDescription());
+		product.setPrice(request.getPrice());
+		product.setStockQuantity(request.getStockQuantity());
+		return ResponseEntity.ok(service.update(product, id));
+	}
+	
+	@DeleteMapping("/product/admin/id/{id}")
+	public ResponseEntity<?> deleteProduct(@PathVariable int id) {
+		if(service.existsById(id)) {
+			service.delete(id);
+			return ResponseEntity.ok("Product with ID: " + id + " has been successfully deleted");
+		}
+		return ResponseEntity.status(404).body("Product with required ID: " + id + " cold not be deleted because it does not exist");
+	}
+	
+	@GetMapping("/product/name/{name}")
+	public ResponseEntity<?> getProductByName(@PathVariable String name) {
+		Optional<Product> product = service.findByProductName(name);
+		if(product.isPresent()) {
+			return ResponseEntity.ok(product.get());
+		}
+		return ResponseEntity.status(404).body("Product with required name: " + name + " does not exist");
+	}
+	
+	@GetMapping("/product/category/{id}")
+	public ResponseEntity<?> getProductByCategory(@PathVariable int id) {
+		Optional<Category> category = categoryService.findById(id);
+		if(category.isEmpty()) {
+			return ResponseEntity.status(400).body("Category with required id: " + id + " does not exist");
+		}
+		List<Product> products = service.findByCategory(category.get());
+		if(products.isEmpty()) {
+			return ResponseEntity.status(404).body("	Category does not have products");
+		}
+		return ResponseEntity.ok(products);
+	}
+	
+	@GetMapping("/product/price/{price}")
+	public ResponseEntity<?> getProductByPrice(@PathVariable double price) {
+		List<Product> products = service.findByPrice(price);
+		if(products.isEmpty()) {
+			return ResponseEntity.status(404).body("Product with required price: " + price + " does not exist");
+		}
+		return ResponseEntity.ok(products);
+	}
+	
+	@GetMapping("/product/price/greater/{price}")
+	public ResponseEntity<?> getProductByPriceGreaterThan(@PathVariable double price) {
+		List<Product> products = service.findByPriceGreaterThan(price);
+		if(products.isEmpty()) {
+			return ResponseEntity.status(404).body("Product with greater price than " + price + " does not exist");
+		}
+		return ResponseEntity.ok(products);
+	}
+	
+	@GetMapping("/product/price/less/{price}")
+	public ResponseEntity<?> getProductByPriceLessThan(@PathVariable double price) {
+		List<Product> products = service.findByPriceLessThan(price);
+		if(products.isEmpty()) {
+			return ResponseEntity.status(404).body("Product with less price than " + price + " does not exist");
+		}
+		return ResponseEntity.ok(products);
+	}
+	
+	@GetMapping("/product/stock/greater/{quantity}")
+	public ResponseEntity<?> getProductByStockQuantityGreatherThan(@PathVariable int quantity) {
+		List<Product> products = service.findByStockQuantityGreaterThan(quantity);
+		if(products.isEmpty()) {
+			return ResponseEntity.status(404).body("Product with greater stock quantity than " + quantity + " does not exist");
+		}
+		return ResponseEntity.ok(products);
+	}
+	
+	@GetMapping("/product/stock/less/{quantity}")
+	public ResponseEntity<?> getProductByStockQuantityLessThan(@PathVariable int quantity) {
+		List<Product> products = service.findByStockQuantityLessThan(quantity);
+		if(products.isEmpty()) {
+			return ResponseEntity.status(404).body("Product with less stock quantity than " + quantity + " does not exist");
+		}
+		return ResponseEntity.ok(products);
+	}
+	
+}

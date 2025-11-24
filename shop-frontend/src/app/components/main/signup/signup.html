@@ -1,0 +1,106 @@
+<div class="auth-container">
+  <div class="bubbles">
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+  </div>
+
+  <div class="auth-card">
+    <div class="header-section">
+      <i class="fas fa-anchor marine-icon"></i>
+      <h2>SIGN UP</h2>
+      <p class="subtitle">Join our shop</p>
+    </div>
+    
+    <form (ngSubmit)="signup()">
+      <div class="input-group">
+        <label for="firstName">
+          <i class="fas fa-user"></i>
+          First Name
+        </label>
+        <input 
+          type="text" 
+          id="firstName" 
+          [(ngModel)]="firstName" 
+          name="firstName" 
+          placeholder="Enter your first name"
+          required>
+      </div>
+      
+      <div class="input-group">
+        <label for="lastName">
+          <i class="fas fa-user"></i>
+          Last Name
+        </label>
+        <input 
+          type="text" 
+          id="lastName" 
+          [(ngModel)]="lastName" 
+          name="lastName" 
+          placeholder="Enter your last name"
+          required>
+      </div>
+      
+      <div class="input-group">
+        <label for="email">
+          <i class="fas fa-envelope"></i>
+          Email Address
+        </label>
+        <input 
+          type="email" 
+          id="email" 
+          [(ngModel)]="email" 
+          name="email" 
+          placeholder="captain@marineshop.com"
+          required>
+      </div>
+
+      <div class="input-group">
+        <label for="phone">
+          <i class="fas fa-envelope"></i>
+          Phone Number
+        </label>
+        <input 
+          type="phone" 
+          id="phone" 
+          [(ngModel)]="phone" 
+          name="phone" 
+          placeholder="066 123 456">
+      </div>
+      
+      <div class="input-group">
+        <label for="password">
+          <i class="fas fa-lock"></i>
+          Password
+        </label>
+        <input 
+          type="password" 
+          id="password" 
+          [(ngModel)]="password" 
+          name="password" 
+          placeholder="Create a secure password"
+          required>
+      </div>
+      
+      <div class="error-message" *ngIf="errorMsg">
+        <i class="fas fa-exclamation-triangle"></i>
+        {{ errorMsg }}
+      </div>
+      
+      <button type="submit" class="signup-button">
+        <i class="fas fa-ship"></i>
+        Create Account
+      </button>
+      
+      <div class="toggle-link">
+        Already aboard? 
+        <a href="/login" (click)="navigateToLogin($event)">
+        <i class="fas fa-compass"></i>
+            Navigate to Login
+        </a>
+      </div>
+    </form>
+  </div>
+</div>

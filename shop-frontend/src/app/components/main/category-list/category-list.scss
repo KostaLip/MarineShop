@@ -1,0 +1,174 @@
+:root {
+  --ocean-blue: #006994;
+  --deep-sea: #003d5c;
+  --sea-foam: #4a9eff;
+  --wave-blue: #0077be;
+  --light-blue: #87ceeb;
+  --navy: #1e3a5f;
+  --hover-overlay: rgba(0, 61, 92, 0.5);
+}
+
+.category-section {
+  padding: 2rem 0;
+  background: linear-gradient(135deg, #e0f7ff 0%, #cceeff 100%); // mekši morski ton
+  min-height: 400px;
+  position: relative;
+
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1rem;
+  }
+
+  .section-header {
+    text-align: center;
+    margin-bottom: 2rem;
+
+    h2 {
+      font-size: 2.5rem;
+      font-weight: 700;
+      color: var(--deep-sea);
+      margin-bottom: 0.5rem;
+      @media (max-width: 768px) { font-size: 2rem; }
+    }
+
+    p {
+      font-size: 1.1rem;
+      color: var(--ocean-blue);
+      font-weight: 400;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+  }
+
+  .categories-container {
+    position: relative;
+    overflow: visible;
+
+    .categories-wrapper {
+      display: flex;
+      gap: 1.5rem;
+      padding: 0 1rem;
+      overflow-x: auto;
+      scroll-behavior: smooth;
+      padding-top: 1rem;
+      padding-bottom: 1rem;
+
+      &::-webkit-scrollbar { height: 8px; }
+      &::-webkit-scrollbar-track { background: rgba(135, 206, 235, 0.2); border-radius: 4px; }
+      &::-webkit-scrollbar-thumb { background: var(--sea-foam); border-radius: 4px; }
+    }
+  }
+
+  .category-card {
+    position: relative;
+    height: 200px;
+    width: 280px;
+    flex-shrink: 0;
+    cursor: pointer;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 8px 25px rgba(0, 105, 148, 0.15);
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+
+    &:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 12px 30px rgba(0, 105, 148, 0.25);
+
+      .card-overlay {
+        background: var(--hover-overlay);
+        backdrop-filter: blur(4px);
+        transition: background 0.3s ease, backdrop-filter 0.3s ease;
+      }
+
+      .category-name { color: #ffffff; }
+      .category-description { opacity: 1; }
+      .explore-btn { opacity: 1; }
+    }
+
+    .card-overlay {
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0, 61, 92, 0.3);
+      z-index: 1;
+      transition: background 0.3s ease, backdrop-filter 0.3s ease;
+    }
+
+    .card-content {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      padding: 1.5rem;
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      height: 100%;
+    }
+
+    .text-content {
+      margin-bottom: 0.5rem;
+
+      .category-name {
+        font-size: 1.4rem;
+        font-weight: 600;
+        color: #ffffff;
+        margin-bottom: 0.3rem;
+        text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+        line-height: 1.2;
+        @media (max-width: 768px) { font-size: 1.2rem; }
+      }
+
+      .category-description {
+        font-size: 0.9rem;
+        color: rgba(255,255,255,0.9);
+        margin: 0;
+        line-height: 1.4;
+        opacity: 0.8;
+        text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+      }
+    }
+
+    .explore-btn {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      color: #ffffff;
+      font-weight: 500;
+      font-size: 0.85rem;
+      opacity: 0;
+      text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+
+      .arrow { font-size: 1rem; }
+    }
+  }
+
+  .category-card {
+    &:nth-child(1):not([style*="background-image"]) { background: linear-gradient(135deg, var(--ocean-blue), var(--deep-sea)); }
+    &:nth-child(2):not([style*="background-image"]) { background: linear-gradient(135deg, var(--sea-foam), var(--wave-blue)); }
+    &:nth-child(3):not([style*="background-image"]) { background: linear-gradient(135deg, var(--wave-blue), var(--navy)); }
+    &:nth-child(4):not([style*="background-image"]) { background: linear-gradient(135deg, var(--light-blue), var(--ocean-blue)); }
+    &:nth-child(5):not([style*="background-image"]) { background: linear-gradient(135deg, var(--deep-sea), var(--sea-foam)); }
+  }
+}
+
+@media (max-width: 768px) {
+  .category-section {
+    padding: 1.5rem 0;
+
+    .section-header {
+      margin-bottom: 1.5rem;
+      h2 { font-size: 2rem; }
+      p { font-size: 1rem; padding: 0 1rem; }
+    }
+
+    .category-card {
+      height: 180px;
+      width: 250px;
+      .card-content { padding: 1.2rem; }
+      .category-name { font-size: 1.2rem; }
+    }
+  }
+}

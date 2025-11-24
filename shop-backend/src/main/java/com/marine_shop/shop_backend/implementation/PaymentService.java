@@ -1,0 +1,87 @@
+package com.marine_shop.shop_backend.implementation;
+
+import java.time.LocalDateTime;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+
+import com.marine_shop.shop_backend.dto.CartItemDTO;
+import com.marine_shop.shop_backend.dto.CheckoutRequest;
+import com.marine_shop.shop_backend.models.Order;
+import com.marine_shop.shop_backend.models.Order.OrderStatus;
+import com.marine_shop.shop_backend.models.Product;
+import com.marine_shop.shop_backend.repository.OrderRepository;
+import com.marine_shop.shop_backend.repository.ProductRepository;
+import com.stripe.Stripe;
+import com.stripe.exception.StripeException;
+import com.stripe.model.checkout.Session;
+import com.stripe.param.checkout.SessionCreateParams;
+
+import jakarta.annotation.PostConstruct;
+
+@Service
+public class PaymentService {
+	@Autowired
+    private OrderRepository orderRepository;
+	
+	@Autowired
+	private ProductRepository productRepository;
+    
+    @Value("${stripe.secret.key}")
+    private String stripeSecretKey;
+    
+    @PostConstruct
+    public void init() {
+        Stripe.apiKey = stripeSecretKey;
+    }
+    
+public String createCheckoutSession(CheckoutRequest request) throws StripeException {
+        
+	for (CartItemDTO item : request.getCartItems()) {
+        Product product = productRepository.findById(item.getProductId()).get();
+        if (item.getQuantity() > product.getStockQuantity()) {
+            throw new RuntimeException("Nema dovoljno proizvoda: " + product.getProductName());
+        }
+    }	
+	
+        Order order = new Order();
+        order.setUser(request.getUser());
+        order.setTotalPrice(request.getAmount());
+        order.setStatus(OrderStatus.PENDING);
+        order.setOrderDate(LocalDateTime.now());
+        order.setShippingCountry(request.getCountry());
+        order.setShippingCity(request.getCity());
+        order.setShippingAddress(request.getAddress());
+        
+        Order savedOrder = orderRepository.save(order);
+        
+        SessionCreateParams params = SessionCreateParams.builder()
+            .setMode(SessionCreateParams.Mode.PAYMENT)
+            .setSuccessUrl("http://localhost:4200/success?session_id={CHECKOUT_SESSION_ID}")
+            .setCancelUrl("http://localhost:4200/cancel")
+            .addLineItem(
+                SessionCreateParams.LineItem.builder()
+                    .setPriceData(
+                        SessionCreateParams.LineItem.PriceData.builder()
+                            .setCurrency("eur")
+                            .setProductData(
+                                SessionCreateParams.LineItem.PriceData.ProductData.builder()
+                                    .setName("Narudžba #" + savedOrder.getOrderID())
+                                    .build())
+                            .setUnitAmount((long)(request.getAmount() * 100))
+                            .build())
+                    .setQuantity(1L)
+                    .build())
+            .putMetadata("order_id", String.valueOf(savedOrder.getOrderID()))
+            .build();
+            
+        Session session = Session.create(params);
+        
+        savedOrder.setStripeSessionId(session.getId());
+        orderRepository.save(savedOrder);
+        
+        return session.getUrl();
+    }
+	
+}

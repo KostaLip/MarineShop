@@ -1,0 +1,48 @@
+<header class="admin-header">
+      <div class="header-container">
+        <div class="logo">
+          <h2>Admin</h2>
+        </div>
+
+        <nav class="admin-nav">
+          <ul class="nav-list">
+            <li class="nav-item">
+              <a 
+                (click)="navigateToCategories()"
+                class="nav-link">
+                Categories
+              </a>
+            </li>
+            <li class="nav-item">
+              <a 
+                (click)="navigateToProducts()"
+                class="nav-link">
+                Products
+              </a>
+            </li>
+            <li class="nav-item">
+              <a 
+                (click)="navigateToUsers()"
+                class="nav-link">
+                Users
+              </a>
+            </li>
+            <li class="nav-item">
+              <a 
+                (click)="navigateToOrders()"
+                class="nav-link">
+                Orders
+              </a>
+            </li>
+          </ul>
+        </nav>
+
+        <div class="admin-actions">
+          <button 
+            class="logout-btn"
+            (click)="logout()">
+            Logout
+          </button>
+        </div>
+      </div>
+    </header>

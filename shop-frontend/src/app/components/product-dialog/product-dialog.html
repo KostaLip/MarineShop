@@ -1,0 +1,126 @@
+<div class="dialog-container">
+  <div class="dialog-header">
+    <div class="header-content">
+      <h2>{{ data.productName }}</h2>
+      <div class="price">{{ data.price | currency:'RSD':'symbol':'1.0-0' }}</div>
+      <p class="description">{{ data.description }}</p>
+    </div>
+  </div>
+
+  <div class="dialog-body">
+    <div class="product-images-container" *ngIf="productImages && productImages.length > 0">
+      <div class="images-header">
+        <h3>Product gallery</h3>
+      </div>
+      
+      <div class="main-image-wrapper">
+        <div class="image-frame">
+          <img 
+            [src]="selectedImage || productImages[0]?.imageUrl" 
+            [alt]="data.productName"
+            class="main-image"
+            (click)="openImageModal(selectedImage || productImages[0]?.imageUrl)">
+        </div>
+      </div>
+      
+      <div class="thumbnails-container" *ngIf="productImages.length > 1">
+        <div 
+          class="thumbnail"
+          [class.active]="selectedImage === image.imageUrl || (!selectedImage && i === 0)"
+          *ngFor="let image of productImages; let i = index"
+          (click)="selectImage(image.imageUrl)">
+          <img [src]="image.imageUrl" [alt]="data.productName + ' - slika ' + (i + 1)">
+        </div>
+      </div>
+    </div>
+
+    <div class="reviews-container">
+      <div class="section-header">
+        <h3>Reviews</h3>
+      </div>
+      
+      <div *ngIf="yourReview" class="review your-review">
+        <div class="review-badge">Your review</div>
+        <div class="review-content">
+          <div class="review-meta">
+            <span class="rating">{{ yourReview.rating }}/5 ★</span>
+            <span class="date">{{ yourReview.dateCreated | date:'dd.MM.yyyy' }}</span>
+          </div>
+          <p class="review-comment">{{ yourReview.reviewComment }}</p>
+        </div>
+      </div>
+
+      <div *ngIf="!yourReview && currentUser" class="add-review-form">
+        <div class="form-header">
+          <h4>Add review</h4>
+        </div>
+        <form (ngSubmit)="submitReview()" #reviewForm="ngForm">
+          <div class="form-fields">
+            <div class="field-group">
+              <label for="rating">Rating</label>
+              <select id="rating" [(ngModel)]="newReview.rating" name="rating" required>
+                <option value="">Choose rating</option>
+                <option value="1">★ 1 - Very bad</option>
+                <option value="2">★★ 2 - Bad</option>
+                <option value="3">★★★ 3 - Average</option>
+                <option value="4">★★★★ 4 - Good</option>
+                <option value="5">★★★★★ 5 - Perfect</option>
+              </select>
+            </div>
+            
+            <div class="field-group">
+              <label for="comment">Comment</label>
+              <textarea 
+                id="comment" 
+                [(ngModel)]="newReview.comment" 
+                name="comment" 
+                placeholder="Share your experience abou this product..." 
+                required
+                maxlength="500">
+              </textarea>
+            </div>
+          </div>
+          
+          <button type="submit" class="submit-btn" [disabled]="!reviewForm.valid">
+            Post a review
+          </button>
+        </form>
+      </div>
+      
+      <div *ngIf="!currentUser" class="login-prompt">
+        <p>Please log in first</p>
+      </div>
+      
+      <div class="reviews-list">
+        <div class="review" *ngFor="let review of reviews">
+          <div class="review-content">
+            <div class="review-header">
+              <span class="user-name">{{ review.user.firstName }} {{ review.user.lastName }}</span>
+              <div class="review-meta">
+                <span class="rating">{{ review.rating }}/5 ★</span>
+                <span class="date">{{ review.dateCreated | date:'dd.MM.yyyy' }}</span>
+              </div>
+            </div>
+            <p class="review-comment">{{ review.reviewComment }}</p>
+          </div>
+        </div>
+      </div>
+      
+      <div *ngIf="reviews.length === 0 && !yourReview" class="no-reviews">
+        <p>No reviews for this product</p>
+        <span>Be the first who will upload review!</span>
+      </div>
+    </div>
+  </div>
+  
+  <div class="dialog-footer">
+    <button (click)="close()" class="close-btn">Exit</button>
+  </div>
+</div>
+<div class="image-modal" *ngIf="showImageModal" (click)="closeImageModal()">
+  <div class="modal-backdrop"></div>
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <button class="close-btn" (click)="closeImageModal()">×</button>
+    <img [src]="modalImage" [alt]="data.productName" class="modal-image">
+  </div>
+</div>

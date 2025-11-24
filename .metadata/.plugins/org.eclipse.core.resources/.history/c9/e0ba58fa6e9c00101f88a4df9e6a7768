@@ -1,0 +1,5 @@
+package com.marine_shop.shop_backend.dto;
+
+public class CartItemDTO {
+
+}
